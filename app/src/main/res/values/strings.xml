@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">TvStackInput</string>
+    <string name="net_input_label">iptv</string>
 </resources>
