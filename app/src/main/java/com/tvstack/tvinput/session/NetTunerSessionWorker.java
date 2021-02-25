@@ -11,16 +11,19 @@ import androidx.annotation.NonNull;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.SimpleExoPlayer;
+import com.tvstack.tvinput.player.NetPlayer;
 
 /**
  * Created by cfp on 2021/2/9.
  */
-public class NetTunerSessionWorker implements Handler.Callback{
+public class NetTunerSessionWorker implements Handler.Callback {
 
     private static final String TAG = "NetTunerSessionWorker";
 
     /*what msg: tune*/
     private static final int MSG_TUNE = 1000;
+    /*what msg: release*/
+    private static final int MSG_RELEASE = 1001;
     /*what msg: set surface*/
     private static final int MSG_SET_SURFACE = 1024;
 
@@ -28,14 +31,14 @@ public class NetTunerSessionWorker implements Handler.Callback{
 
     private Surface mSurface;
 
-    private SimpleExoPlayer mPlayer;
+    private NetPlayer mPlayer;
 
     private Context mContext;
 
     private Uri mUri;
 
 
-    public NetTunerSessionWorker(Context context){
+    public NetTunerSessionWorker(Context context) {
         this.mContext = context;
         mHandler = new Handler(this);
     }
@@ -47,32 +50,47 @@ public class NetTunerSessionWorker implements Handler.Callback{
     @Override
     public boolean handleMessage(@NonNull Message msg) {
 
-        switch (msg.what){
+        switch (msg.what) {
             case MSG_TUNE:
                 return handleMessageTune((Uri) msg.obj);
             case MSG_SET_SURFACE:
                 return handleMessageSetSurface();
+            case MSG_RELEASE:
+                return handleMessageRelease();
         }
         return false;
+    }
+
+    private boolean handleMessageRelease() {
+        stopPlayback();
+        return false;
+    }
+
+    private void stopPlayback() {
+
+        if (mPlayer != null) {
+            mPlayer.setPlayWhenReady(false);
+            mPlayer.release();
+            mPlayer = null;
+        }
     }
 
     private boolean handleMessageTune(Uri uri) {
 
         //如果多个tune request 则跳过中间的tune request
-        if(mHandler.hasMessages(MSG_TUNE)){
+        if (mHandler.hasMessages(MSG_TUNE)) {
             return true;
         }
         mUri = uri;
         preparePlayback();
+        startPlayback();
         return false;
     }
 
     private boolean handleMessageSetSurface() {
 
-        if(mPlayer != null){
-            mPlayer.setVideoSurface(mSurface);
-        }else{
-            resetPlayback();
+        if (mPlayer != null) {
+            mPlayer.setSurface(mSurface);
         }
         return true;
     }
@@ -83,36 +101,38 @@ public class NetTunerSessionWorker implements Handler.Callback{
 
     public void setSurface(Surface surface) {
 
-        if(surface != null && !surface.isValid()){
+        if (surface != null && !surface.isValid()) {
             // TODO: 2021/2/19
             return;
         }
         mSurface = surface;
+        mHandler.sendEmptyMessage(MSG_SET_SURFACE);
     }
 
-    private void resetPlayback(){
-        preparePlayback();
-        startPlayback();
-    }
 
-    private void preparePlayback(){
-        SimpleExoPlayer player = createPlayer();
-        MediaItem mediaItem = MediaItem.fromUri(mUri);
-        player.setMediaItem(mediaItem);
+    private void preparePlayback() {
+        NetPlayer player = createPlayer();
         mPlayer = player;
-        mPlayer.prepare();
+        mPlayer.prepare(mUri);
     }
 
-    private void startPlayback(){
-        mPlayer.play();
+    private void startPlayback() {
+        mPlayer.setPlayWhenReady(true);
     }
 
-    private SimpleExoPlayer createPlayer() {
-        return new SimpleExoPlayer.Builder(mContext).build();
+    private NetPlayer createPlayer() {
+        return new NetPlayer(mContext);
     }
 
-    public static class Factory{
-        NetTunerSessionWorker create(Context context){
+    /**
+     * release resource
+     */
+    public void release() {
+        mHandler.sendEmptyMessage(MSG_RELEASE);
+    }
+
+    public static class Factory {
+        NetTunerSessionWorker create(Context context) {
             return new NetTunerSessionWorker(context);
         }
     }

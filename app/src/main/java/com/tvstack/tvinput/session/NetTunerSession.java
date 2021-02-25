@@ -29,13 +29,13 @@ public class NetTunerSession extends TvInputService.Session {
 
     @Override
     public void onRelease() {
-
+        mNetTunerSessionWorker.release();
     }
 
     @Override
     public boolean onSetSurface(@Nullable Surface surface) {
         mNetTunerSessionWorker.setSurface(surface);
-        return false;
+        return true;
     }
 
     @Override
@@ -46,6 +46,7 @@ public class NetTunerSession extends TvInputService.Session {
     @Override
     public boolean onTune(Uri channelUri) {
         mNetTunerSessionWorker.tune(channelUri);
+        notifyVideoAvailable();
         return true;
     }
 
