@@ -102,6 +102,7 @@ public class IPTVFetchTask<Params, Progress, Result> extends AsyncTask<Params, P
             values.put(TvContract.Channels.COLUMN_TRANSPORT_STREAM_ID, channel.getTransportStreamId());
             values.put(TvContract.Channels.COLUMN_SERVICE_ID, channel.getServiceId());
             values.put(TvContract.Channels.COLUMN_INTERNAL_PROVIDER_DATA, channel.getInternalProviderDataByteArray());
+//            cr.insert(TvContract.Channels.CONTENT_URI, values);
         }
     }
 }
