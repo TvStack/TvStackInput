@@ -13,7 +13,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.tvstack.tvinput.constants.Constants;
-import com.tvstack.tvinput.entity.IPTVEntity;
+import com.tvstack.tvinput.data.IPTVEntity;
 
 import java.io.IOException;
 import java.util.List;

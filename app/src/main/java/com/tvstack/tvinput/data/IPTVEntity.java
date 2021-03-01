@@ -1,4 +1,4 @@
-package com.tvstack.tvinput.entity;
+package com.tvstack.tvinput.data;
 
 import java.util.List;
 
