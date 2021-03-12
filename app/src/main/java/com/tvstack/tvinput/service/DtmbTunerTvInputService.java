@@ -1,6 +1,7 @@
 package com.tvstack.tvinput.service;
 
 import com.tvstack.tvinput.factory.DtmbTunerSessionFactory;
+import com.tvstack.tvinput.factory.TunerRecordingSessionFactory;
 import com.tvstack.tvinput.factory.TunerSessionFactory;
 
 /**
@@ -11,5 +12,10 @@ public class DtmbTunerTvInputService extends BaseTunerTvInputService{
     @Override
     public TunerSessionFactory getTunerSessionFactory() {
         return new DtmbTunerSessionFactory();
+    }
+
+    @Override
+    public TunerRecordingSessionFactory getTunerRecordingSessionFactory() {
+        return null;
     }
 }
